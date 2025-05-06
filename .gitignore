@@ -1,8 +1,8 @@
 # Ignorar dados do Banco
-.env/
+projeto/.env
 
 # Ignorar ambientes virtuais
 venv/
 
 # Ignorar arquivos de cache
-__pycache__/
+projeto-cinema/__pycache__/
