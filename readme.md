@@ -39,7 +39,6 @@ Descrição de cada tabela do Banco de Dados:
 - **Assentos**: Tabela com os assentos de cada sala.  
 - **Reservas**: Tabela que guarda a reserva que um determinado usuário fez de um assento para uma determinada sessão.
 
----
 
 ## API Backend: FastAPI
 
@@ -58,7 +57,6 @@ A API foi desenvolvida em FastAPI devido à sua performance, suporte a validaç�
 - `/cadastrar-filme`: Adicionar um novo filme no banco de dados. (POST) ✅  
 - `/iarley`:  
 
----
 
 ### Como funciona uma API?
 
@@ -108,20 +106,65 @@ Solução Proposta
 
 Transações em Banco de Dados devem obedecer aos princípios ACID, para garantir a integridade e a consistência dos dados.
 
-    Atomicidade: A transação é “tudo ou nada”. Ou todas as operações são concluídas com sucesso, ou nenhuma é.
+Atomicidade: A transação é “tudo ou nada”. Ou todas as operações são concluídas com sucesso, ou nenhuma é.
 
-    Consistência: Após a transação, o banco deve permanecer em um estado consistente, respeitando todas as regras e restrições definidas.
+Consistência: Após a transação, o banco deve permanecer em um estado consistente, respeitando todas as regras e restrições definidas.
 
-    Isolamento: Transações simultâneas não devem interferir entre si. Cada uma deve parecer ser executada isoladamente.
+Isolamento: Transações simultâneas não devem interferir entre si. Cada uma deve parecer ser executada isoladamente.
 
-    Durabilidade: Uma vez confirmadas, as alterações da transação persistem no banco mesmo em caso de falha do sistema.
+Durabilidade: Uma vez confirmadas, as alterações da transação persistem no banco mesmo em caso de falha do sistema.
 
 Para garantir que esses princípios sejam atendidos, implementamos transações explícitas e uso de locks pessimistas.
 
-    (Trecho do Código)
+```python
+@app.post("/reservar")
+def reservar_assento(reserva: ReservaRequest):
+    conn = get_connection()
+    cursor = conn.cursor()
 
-No trecho de código mostrado acima, a transação é iniciada com conn.begin() e é encerrada com conn.commit() se tudo correr bem ou conn.rollback() em caso de erro.
+    try:
+        conn.begin()
+        # Pegando o ID do Assento
+        cursor.execute("""
+        SELECT 
+            A.id 
+        FROM Assentos AS A 
+        JOIN Sessoes AS S ON A.sala_id = S.sala_id 
+        JOIN Agenda_Sessao AS AG ON AG.sessao_id = S.id 
+        WHERE AG.id = %s AND A.numero = %s FOR UPDATE
+        """, (reserva.agenda_sessao_id, reserva.assento_numero))
+        
+        resultado = cursor.fetchone()
 
-O uso explícito de FOR UPDATE nas consultas impede que outras transações leiam ou escrevam os mesmos registros simultaneamente, aplicando um lock pessimista durante a leitura dos dados críticos.
+        # Verificando se o assento é válido para uma dada sessão
+        if not resultado:
+            raise HTTPException(status_code=404, detail="Assento não encontrado para essa sessão.")
+        
+        assento_id = resultado[0]
+        
+        # Verificando se o assento não foi reservado para outra pessoa
+        cursor.execute("SELECT 1 FROM Reservas WHERE agenda_sessao_id = %s AND assento_id = %s FOR UPDATE", (reserva.agenda_sessao_id, assento_id))
+
+        if cursor.fetchone():
+            raise HTTPException(status_code=400, detail="Assento já reservado para essa sessão.")
+        
+        # Reserva o assento
+        cursor.execute("INSERT INTO Reservas (usuario_id, agenda_sessao_id, assento_id) VALUES (%s, %s, %s)", (reserva.usuario_id, reserva.agenda_sessao_id, assento_id))
+
+        conn.commit()
+        
+        return {"mensagem": f"Assento {reserva.assento_numero} reservado com sucesso para a sessão {reserva.agenda_sessao_id}."}
+
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=f"Erro na reserva: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+```
+
+No trecho de código mostrado acima, a transação é iniciada com `conn.begin()` e é encerrada com `conn.commit()` se tudo correr bem ou `conn.rollback()` em caso de erro.
+
+O uso explícito de `FOR UPDATE` nas consultas impede que outras transações leiam ou escrevam os mesmos registros simultaneamente, aplicando um lock pessimista durante a leitura dos dados críticos.
 
 Isso evita condições de corrida, garantindo que duas pessoas não reservem o mesmo assento ao mesmo tempo.
