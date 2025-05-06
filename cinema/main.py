@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
-from conecao import get_connection
-from models import ReservaRequest
+from cinema.conecao import get_connection
+from cinema.models import ReservaRequest
 
 app = FastAPI()
 
