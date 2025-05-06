@@ -106,13 +106,13 @@ Solução Proposta
 
 Transações em Banco de Dados devem obedecer aos princípios ACID, para garantir a integridade e a consistência dos dados.
 
-Atomicidade: A transação é “tudo ou nada”. Ou todas as operações são concluídas com sucesso, ou nenhuma é.
+- Atomicidade: A transação é “tudo ou nada”. Ou todas as operações são concluídas com sucesso, ou nenhuma é.
 
-Consistência: Após a transação, o banco deve permanecer em um estado consistente, respeitando todas as regras e restrições definidas.
+- Consistência: Após a transação, o banco deve permanecer em um estado consistente, respeitando todas as regras e restrições definidas.
 
-Isolamento: Transações simultâneas não devem interferir entre si. Cada uma deve parecer ser executada isoladamente.
+- Isolamento: Transações simultâneas não devem interferir entre si. Cada uma deve parecer ser executada isoladamente.
 
-Durabilidade: Uma vez confirmadas, as alterações da transação persistem no banco mesmo em caso de falha do sistema.
+- Durabilidade: Uma vez confirmadas, as alterações da transação persistem no banco mesmo em caso de falha do sistema.
 
 Para garantir que esses princípios sejam atendidos, implementamos transações explícitas e uso de locks pessimistas.
 
