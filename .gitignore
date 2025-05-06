@@ -1,5 +1,5 @@
-# Ignorar daados do Banco
-/cinema/.env
+# Ignorar dados do Banco
+.env
 
 # Ignorar ambientes virtuais
 /venv
