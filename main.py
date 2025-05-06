@@ -31,7 +31,7 @@ def listar_filmes_sessao():
     conn.close()
     return {"assentos": sessoes}
 
-""" Listar os assentos disponíveis dada uma sessão (Filme, Horário e Data) """
+""" Listar os assentos disponíveis dada uma sessão """
 @app.get("/assentos")
 def listar_assentos():
     conn = get_connection()
