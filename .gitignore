@@ -3,3 +3,6 @@
 
 # Ignorar ambientes virtuais
 /venv
+
+# Ignorar arquivos de cache
+/__pycache__
