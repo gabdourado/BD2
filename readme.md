@@ -169,3 +169,10 @@ No trecho de código mostrado acima, a transação é iniciada com `conn.begin()
 O uso explícito de `FOR UPDATE` nas consultas impede que outras transações leiam ou escrevam os mesmos registros simultaneamente, aplicando um lock pessimista durante a leitura dos dados críticos.
 
 Isso evita condições de corrida, garantindo que duas pessoas não reservem o mesmo assento ao mesmo tempo.
+
+## Autores do Projeto
+
+- **Ednilson Silverio**
+- **Gabriel Dourado** – [@gabdourado](https://github.com/gabdourado)
+- **Iarley Freitas**
+- **Leonardo Uchoa**

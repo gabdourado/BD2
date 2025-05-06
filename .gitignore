@@ -1,8 +1,8 @@
 # Ignorar dados do Banco
-.env
+.env/
 
 # Ignorar ambientes virtuais
-/venv
+venv/
 
 # Ignorar arquivos de cache
-/__pycache__
+__pycache__/
