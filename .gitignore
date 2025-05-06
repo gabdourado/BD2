@@ -3,9 +3,3 @@
 
 # Ignorar ambientes virtuais
 /venv
-
-# Ignorar arquivos de notas :)
-notas.md
-
-# Ignorar script.sh
-script.sh
