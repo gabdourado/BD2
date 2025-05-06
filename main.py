@@ -1,8 +1,13 @@
 from fastapi import FastAPI, HTTPException
-from cinema.conecao import get_connection
-from cinema.models import ReservaRequest
+from conecao import get_connection
+from models import ReservaRequest
 
 app = FastAPI()
+
+""" Sendo simpático :) """
+@app.get("/")
+def boas_vindas():
+    return {"saudacao":"Olá, Professor!"}
 
 """ Listando os filmes e suas sessões por data """
 @app.get("/sessoes")
