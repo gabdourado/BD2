@@ -5,7 +5,6 @@ from models import AssentoRemove, RemoveReserva
 
 router = APIRouter(prefix="", tags=["DELETE"])
 
-""" Remover um determinado assento de determinada sala """
 @router.delete("/remover-assento")
 def remover_assento(remove: AssentoRemove):
     conn = get_connection()
@@ -46,9 +45,7 @@ def remover_assento(remove: AssentoRemove):
         return {"mensagem": f"Assento {remove.assento_numero} da sala {remove.sala_id} removido com sucesso."}
     else:
         return {"mensagem": f"Assento {remove.assento_numero} não encontrado na sala {remove.sala_id}."}
-    
-    
-""" Deleta uma reserva para uma sessão específica. (DELETE)  """
+
 @router.delete("/deletar-reserva")
 def deletar_reserva(remove: RemoveReserva):
     try:
@@ -73,20 +70,24 @@ def deletar_reserva(remove: RemoveReserva):
         """, (remove.usuario_id, remove.agenda_sessao_id, assento_id))
 
         if not cursor.fetchone():
-            return {'erro': "Este assento ainda não foi reservado."}
+            return {'erro': "Não há ninguém com essa reserva."}
 
         # Remove a reserva
         cursor.execute("""
             DELETE FROM Reservas 
             WHERE usuario_id = %s AND agenda_sessao_id = %s AND assento_id = %s;
         """, (remove.usuario_id, remove.agenda_sessao_id, assento_id))
+        
         conn.commit()
 
         return {'mensagem': "Reserva cancelada com sucesso."}
 
     except Exception as e:
+        conn.rollback()
         return {'erro': f"Erro ao cancelar reserva: {str(e)}"}
     
     finally:
-        cursor.close()
-        conn.close()
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()

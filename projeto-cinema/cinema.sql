@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS Filmes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     titulo VARCHAR(100) NOT NULL,
     genero VARCHAR(50),
-    duracao TIME,
+    duracao VARCHAR(20),
     formato VARCHAR(20)
 );
 -- Tabela de salas de exibição
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS Sessoes (
     id INT AUTO_INCREMENT PRIMARY KEY,
     filme_id INT NOT NULL,
     sala_id INT NOT NULL,
-    horario_padrao TIME NOT NULL,
+    horario_padrao VARCHAR(20) NOT NULL,
     preco DECIMAL(6,2) NOT NULL DEFAULT 24.00, -- Preço da Inteira :/
 
     FOREIGN KEY (filme_id) REFERENCES Filmes(id),
@@ -39,7 +39,6 @@ CREATE TABLE IF NOT EXISTS Assentos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     sala_id INT NOT NULL,
     numero VARCHAR(10) NOT NULL,
-    reservado BOOLEAN DEFAULT FALSE, 
 
     FOREIGN KEY (sala_id) REFERENCES Salas(id),
     UNIQUE (sala_id, numero) -- Evita assentos duplicados para uma mesma sala
@@ -77,8 +76,8 @@ INSERT INTO Salas (nome) VALUES
 -- Inserindo sessões
 INSERT INTO Sessoes (filme_id, sala_id, horario_padrao, preco) VALUES
 (1, 1, '18:00:00', 24.00), -- Superman na Sala 1
-(2, 2, '20:00:00', 26.00), -- Thunderbolts na Sala 2
-(3, 1, '16:00:00', 22.00), -- Quarteto Fantástico na Sala 1
+(2, 2, '20:00:00', 24.00), -- Thunderbolts na Sala 2
+(3, 1, '16:00:00', 12.00), -- Quarteto Fantástico na Sala 1
 (4, 3, '21:00:00', 30.00); -- Deadpool 3 na IMAX
 -- Inserindo agenda de sessões
 INSERT INTO Agenda_Sessao (sessao_id, data_sessao) VALUES

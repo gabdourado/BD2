@@ -4,36 +4,36 @@ from models import ReservaRequest, AssentoCreate, AssentoRemove, CadastraFilme, 
 
 router = APIRouter(prefix="", tags=["POST"])
 
-""""  Adicionar um novo usuário no banco de dados. (POST) """
 @router.post("/cadastrar-usuario")
 def cadastrar_usuario(usuario: UsuarioCreate):
-    conn = get_connection()
-    cursor = conn.cursor()
-
     try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
         cursor.execute(
             "INSERT INTO Usuarios (nome, email) VALUES (%s, %s)",
             (usuario.nome, usuario.email)
         )
         conn.commit()
+        
         return {"mensagem": "Usuário cadastrado com sucesso!"}
     
     except Exception as e:
         conn.rollback()
         raise HTTPException(status_code=500, detail=str(e))
+    
     finally:
-        cursor.close()
-        conn.close()
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
 
-
-
-""" Reserva um assento para uma sessão específica. (POST) """
 @router.post("/fazer-reserva")
 def reservar_assento(reserva: ReservaRequest):
-    conn = get_connection()
-    cursor = conn.cursor()
-
     try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
         conn.begin()
         # Pegando o ID do Assento
         cursor.execute(""" 
@@ -72,7 +72,6 @@ def reservar_assento(reserva: ReservaRequest):
             %s
         );
         """, (reserva.usuario_id, reserva.agenda_sessao_id, assento_id))
-
         conn.commit()
         
         return {"mensagem": f"Assento {reserva.assento_numero} reservado com sucesso para a sessão {reserva.agenda_sessao_id}."}
@@ -80,13 +79,13 @@ def reservar_assento(reserva: ReservaRequest):
     except Exception as e:
         conn.rollback()
         raise HTTPException(status_code=500, detail=f"Erro na reserva: {e}")
+    
     finally:
-        cursor.close()
-        conn.close()
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
 
-
-
-""" Adicionar um novo assento em determinada sala (POST) """
 @router.post("/adicionar_assento")
 def adicionar_assento(create: AssentoCreate):
     conn = get_connection()
@@ -115,16 +114,18 @@ def adicionar_assento(create: AssentoCreate):
         );
         """, (create.sala_id, create.assento_numero))
         conn.commit()
-        return {"mensagem": f"Assento {create.assento_numero} reservado na sala {create.sala_id}."}
-    else:
-        return {"mensagem": f"Assento {create.assento_numero} já foi reservado na sala {create.sala_id}"}
 
-""""  Adicionar um novo filme no banco de dados. (POST) """
+        return {"mensagem": f"Assento {create.assento_numero} adicionado na sala {create.sala_id}."}
+    
+    else:
+        return {"mensagem": f"Assento {create.assento_numero} já foi adicionado na sala {create.sala_id}"}
+
 @router.post("/cadastrar-filme")
 def cadastrar_filme(filme: CadastraFilme):
-    conn = get_connection()
-    cursor = conn.cursor()
     try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        
         cursor.execute("""
             INSERT INTO Filmes (
                 titulo, 
@@ -141,10 +142,15 @@ def cadastrar_filme(filme: CadastraFilme):
             (filme.titulo, filme.genero, filme.duracao, filme.formato))
         
         conn.commit()
+
         return {"mensagem": f"Filme '{filme.titulo}' cadastrado com sucesso."}
+    
     except Exception as e:
         conn.rollback()
         raise HTTPException(status_code=500, detail=f"Erro ao cadastrar filme: {e}")
+    
     finally:
-        cursor.close()
-        conn.close()
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()

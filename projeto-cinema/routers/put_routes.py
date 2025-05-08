@@ -5,13 +5,11 @@ from models import ReservaRequest
 
 router = APIRouter(prefix="", tags=["PUT"])
 
-""""  Altera uma reserva feita por um usuário específico. (PUT) """
 @router.put("/alterar-reserva/{reserva_id}")
 def alterar_reserva(reserva_id: int, nova_reserva: ReservaRequest):
-    conn = get_connection()
-    cursor = conn.cursor()
-
     try:
+        conn = get_connection()
+        cursor = conn.cursor()
         conn.begin()
 
         # Verifica se a reserva existe
@@ -56,6 +54,9 @@ def alterar_reserva(reserva_id: int, nova_reserva: ReservaRequest):
     except Exception as e:
         conn.rollback()
         raise HTTPException(status_code=500, detail=f"Erro ao alterar reserva: {e}")
+    
     finally:
-        cursor.close()
-        conn.close()
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
