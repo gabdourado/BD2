@@ -22,3 +22,8 @@ class CadastraFilme(BaseModel):
 class UsuarioCreate(BaseModel):
     nome: str
     email: str
+
+class RemoveReserva(BaseModel):
+    usuario_id: int
+    agenda_sessao_id: int
+    assento_numero: str
