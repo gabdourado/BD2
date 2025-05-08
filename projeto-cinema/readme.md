@@ -46,20 +46,36 @@ A API foi desenvolvida em FastAPI devido à sua performance, suporte a validaç�
 
 **Os principais endpoints criados incluem:**
 
-- `/`: Mensagem de boas vindas (GET) ✅
-- `/cadastrar-usuario`: Adiciona um novo usuário no banco de dados. (POST) ✅ 
-- `/mostrar-sessoes`: Lista as sessões com seus respectivos filmes. (GET) ✅ 
-- `/mostrar-assentos-disponiveis`: Listar os assentos disponíveis de cada sessão. (GET) ✅
-- `/fazer-reserva`: Reserva um assento para uma sessão específica. (POST) 🔄  
-- `/mostrar-reservas`: Mostra todas as reservas de uma determinada sessão (GET) ✅
-- `/alterar-reserva`: Altera uma reserva feita por um usuário específico. (PUT) ✅  
-- `/deletar-reserva`: Deleta uma reserva para uma sessão específica. (DELETE) ✅  
-- `/adicionar-assento`: Adiciona um novo assento em uma sala específica. (POST) ✅
-- `/remover-assento`: Remove um novo assento em uma sala específica. (POST) ✅
-- `/cadastrar-filme`: Adicionar um novo filme no banco de dados. (POST) ✅  
+- `/`: Mensagem de boas vindas (GET)
+- `/cadastrar-usuario`: Adiciona um novo usuário no banco de dados. (POST)
+- `/mostrar-sessoes`: Lista as sessões com seus respectivos filmes. (GET)
+- `/mostrar-assentos-disponiveis`: Listar os assentos disponíveis de cada sessão. (GET)
+- `/fazer-reserva`: Reserva um assento para uma sessão específica. (POST)
+- `/mostrar-reservas`: Mostra todas as reservas de uma determinada sessão (GET)
+- `/alterar-reserva`: Altera uma reserva feita por um usuário específico. (PUT)
+- `/deletar-reserva`: Deleta uma reserva para uma sessão específica. (DELETE)
+- `/adicionar-assento`: Adiciona um novo assento em uma sala específica. (POST)
+- `/remover-assento`: Remove um novo assento em uma sala específica. (POST)
+- `/cadastrar-filme`: Adicionar um novo filme no banco de dados. (POST)
 
 
 ### Como funciona uma API?
+
+Uma API é uma interface que permite a comunicação entre sistemas via requisições e respostas. O cliente envia uma requisição de dados, e o servidor processa e responde com informações ou erros. As respostas geralmente vêm em formato JSON.
+
+APIs são usadas para acessar ou modificar dados de forma padronizada. No nosso trabalho usamos o FastApi para fazer essa ligação. Vale lembrar que as requisições são feitas usando HTTP.
+
+```python
+from fastapi import FastAPI
+from routers import get_routes, post_routes, put_routes, delete_routes
+
+app = FastAPI()
+
+app.include_router(get_routes.router)
+app.include_router(post_routes.router)
+app.include_router(put_routes.router)
+app.include_router(delete_routes.router)
+```
 
 ### O que é Pydantic?
 

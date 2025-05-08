@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter
 from conecao import get_connection
 from models import AssentoRemove, RemoveReserva
 
