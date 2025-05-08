@@ -33,46 +33,60 @@ def cadastrar_usuario(usuario: UsuarioCreate):
 """ Lista as sessões com seus respectivos filmes. (GET) """
 @app.get("/mostrar-sessoes")
 def listar_filmes_sessao():
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute(""" 
-    SELECT 
-        A.data_sessao, 
-        Sa.nome, 
-        Se.horario_padrao, 
-        F.titulo, 
-        F.duracao, 
-        F.formato, 
-        Se.preco  
-    FROM Filmes AS F 
-    JOIN Sessoes AS Se ON F.id = Se.filme_id 
-    JOIN Salas AS Sa ON Se.sala_id = Sa.id 
-    JOIN Agenda_Sessao AS A ON A.sessao_id = Se.id 
-    ORDER BY data_sessao;
-    """)
-    
-    resultados = cursor.fetchall()
-    sessoes = []
-    for linha in resultados:
-        sessoes.append({
-            "Data_Sessao":linha[0],
-            "Nome_Sala":linha[1],
-            "Horario": linha[2],
-            "Filme": linha[3],
-            "Duracao": linha[4],
-            "Formato":linha[5],
-            "Preco":linha[6]
-        })
-    cursor.close()
-    conn.close()
-    return {"assentos": sessoes}
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute(""" 
+            SELECT 
+                A.data_sessao, 
+                Sa.nome, 
+                Se.horario_padrao, 
+                F.titulo, 
+                F.duracao, 
+                F.formato, 
+                Se.preco  
+            FROM Filmes AS F 
+            JOIN Sessoes AS Se ON F.id = Se.filme_id 
+            JOIN Salas AS Sa ON Se.sala_id = Sa.id 
+            JOIN Agenda_Sessao AS A ON A.sessao_id = Se.id 
+            ORDER BY data_sessao;
+        """)
+
+        resultados = cursor.fetchall()
+
+        sessoes = [
+            {
+                "Data_Sessao": linha[0],
+                "Nome_Sala": linha[1],
+                "Horario": linha[2],
+                "Filme": linha[3],
+                "Duracao": linha[4],
+                "Formato": linha[5],
+                "Preco": linha[6]
+            }
+            for linha in resultados
+        ]
+
+        return {"sessoes": sessoes}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao buscar sessões: {str(e)}")
+
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
 
 """  Listar assentos disponíveis para uma sessão específica. (GET) """
 @app.get("/mostrar-assentos-disponiveis")
 def mostrar_assentos_disponiveis():
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
             SELECT 
                 AG.id AS agenda_sessao_id,
                 S.sala_id,
@@ -87,17 +101,25 @@ def mostrar_assentos_disponiveis():
             ORDER BY AG.id, A.numero;
         """)
         
-    respostas = cursor.fetchall()
-    dados = []
-    for resposta in respostas:
-        dados.append({
-            "Agenda_Sessao":resposta[0],
-            "Sala_ID":resposta[1],
-            "Assento":resposta[2]
-        })
-    cursor.close()
-    conn.close()
-    return {"dados": dados}
+        respostas = cursor.fetchall()
+        assentos = []
+        for resposta in respostas:
+            assentos.append({
+                "Agenda_Sessao":resposta[0],
+                "Sala_ID":resposta[1],
+                "Assento":resposta[2]
+            })
+        return {"assentos": assentos}
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Erro ao buscar sessões: {str(e)}")
+
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
+
 
 """ Reserva um assento para uma sessão específica. (POST) """
 @app.post("/fazer-reserva")
@@ -152,9 +174,12 @@ def reservar_assento(reserva: ReservaRequest):
     except Exception as e:
         conn.rollback()
         raise HTTPException(status_code=500, detail=f"Erro na reserva: {e}")
+    
     finally:
-        cursor.close()
-        conn.close()
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
 
 """ Mostra todas as reservas de uma determinada sessão (GET) """
 @app.get("/mostrar-reservas")

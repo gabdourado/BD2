@@ -47,9 +47,9 @@ A API foi desenvolvida em FastAPI devido à sua performance, suporte a validaç�
 **Os principais endpoints criados incluem:**
 
 - `/`: Mensagem de boas vindas (GET) ✅
-- `/cadastrar-usuario`: Adiciona um novo usuário no banco de dados. (POST)
+- `/cadastrar-usuario`: Adiciona um novo usuário no banco de dados. (POST) ✅ 
 - `/mostrar-sessoes`: Lista as sessões com seus respectivos filmes. (GET) ✅ 
-- `/mostrar-assentos-disponiveis`: Listar assentos disponíveis para uma sessão específica. (GET)
+- `/mostrar-assentos-disponiveis`: Listar assentos disponíveis para uma sessão específica. (GET) ✅
 - `/fazer-reserva`: Reserva um assento para uma sessão específica. (POST) 🔄  
 - `/mostrar-reservas`: Mostra todas as reservas de uma determinada sessão (GET)  
 - `/alterar-reserva`: Altera uma reserva feita por um usuário específico. (PUT) ✅  
@@ -176,7 +176,7 @@ Isso evita condições de corrida, garantindo que duas pessoas não reservem o m
 
 ## Autores do Projeto
 
-- **Ednilson Silverio**
+- **Ednilson Silverio** –
 - **Gabriel Dourado** – [@gabdourado](https://github.com/gabdourado)
-- **Iarley Freitas**
-- **Leonardo Uchoa**
+- **Iarley Freitas** – [@IarleyF](https://github.com/IarleyF)
+- **Leonardo Uchoa** –
