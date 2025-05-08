@@ -47,17 +47,16 @@ A API foi desenvolvida em FastAPI devido à sua performance, suporte a validaç�
 **Os principais endpoints criados incluem:**
 
 - `/`: Mensagem de boas vindas (GET)
-- `/cadastrar-usuario`: Adiciona um novo usuário no banco de dados. (POST)
 - `/mostrar-sessoes`: Lista as sessões com seus respectivos filmes. (GET)
 - `/mostrar-assentos-disponiveis`: Listar os assentos disponíveis de cada sessão. (GET)
-- `/fazer-reserva`: Reserva um assento para uma sessão específica. (POST)
 - `/mostrar-reservas`: Mostra todas as reservas de uma determinada sessão (GET)
-- `/alterar-reserva`: Altera uma reserva feita por um usuário específico. (PUT)
-- `/deletar-reserva`: Deleta uma reserva para uma sessão específica. (DELETE)
+- `/cadastrar-usuario`: Adiciona um novo usuário no banco de dados. (POST)
+- `/fazer-reserva`: Reserva um assento para uma sessão específica. (POST)
 - `/adicionar-assento`: Adiciona um novo assento em uma sala específica. (POST)
-- `/remover-assento`: Remove um novo assento em uma sala específica. (POST)
 - `/cadastrar-filme`: Adicionar um novo filme no banco de dados. (POST)
-
+- `/alterar-reserva`: Altera uma reserva feita por um usuário específico. (PUT)
+- `/remover-assento`: Remove um novo assento em uma sala específica. (DELETE)
+- `/deletar-reserva`: Deleta uma reserva para uma sessão específica. (DELETE)
 
 ### Como funciona uma API?
 
@@ -134,12 +133,13 @@ Transações em Banco de Dados devem obedecer aos princípios ACID, para garanti
 Para garantir que esses princípios sejam atendidos, implementamos transações explícitas e uso de locks pessimistas.
 
 ```python
-@app.post("/fazer-reserva")
-def reservar_assento(reserva: ReservaRequest):
-    conn = get_connection()
-    cursor = conn.cursor()
 
+@router.post("/fazer-reserva")
+def reservar_assento(reserva: ReservaRequest):
     try:
+        conn = get_connection()
+        cursor = conn.cursor()
+
         conn.begin()
         # Pegando o ID do Assento
         cursor.execute(""" 
@@ -178,10 +178,19 @@ def reservar_assento(reserva: ReservaRequest):
             %s
         );
         """, (reserva.usuario_id, reserva.agenda_sessao_id, assento_id))
-
         conn.commit()
         
         return {"mensagem": f"Assento {reserva.assento_numero} reservado com sucesso para a sessão {reserva.agenda_sessao_id}."}
+
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=f"Erro na reserva: {e}")
+    
+    finally:
+        if 'cursor' in locals():
+            cursor.close()
+        if 'conn' in locals():
+            conn.close()
 ```
 
 No trecho de código mostrado acima, a transação é iniciada com `conn.begin()` e é encerrada com `conn.commit()` se tudo correr bem ou `conn.rollback()` em caso de erro.
