@@ -18,3 +18,7 @@ class CadastraFilme(BaseModel):
     genero: str
     duracao: str
     formato: str
+
+class UsuarioCreate(BaseModel):
+    nome: str
+    email: str

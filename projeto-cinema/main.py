@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from conecao import get_connection
-from models import ReservaRequest, AssentoCreate, AssentoRemove, CadastraFilme
+from models import ReservaRequest, AssentoCreate, AssentoRemove, CadastraFilme, UsuarioCreate
 
 app = FastAPI()
 
@@ -11,8 +11,24 @@ def boas_vindas():
     
 """"  Adicionar um novo usuário no banco de dados. (POST) """
 @app.post("/cadastrar-usuario")
-def cadastrar_usuario():
-    return {"status":"Vem air!"}
+def cadastrar_usuario(usuario: UsuarioCreate):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            "INSERT INTO Usuarios (nome, email) VALUES (%s, %s)",
+            (usuario.nome, usuario.email)
+        )
+        conn.commit()
+        return {"mensagem": "Usuário cadastrado com sucesso!"}
+    
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        cursor.close()
+        conn.close()
 
 """ Lista as sessões com seus respectivos filmes. (GET) """
 @app.get("/mostrar-sessoes")
@@ -54,7 +70,34 @@ def listar_filmes_sessao():
 """  Listar assentos disponíveis para uma sessão específica. (GET) """
 @app.get("/mostrar-assentos-disponiveis")
 def mostrar_assentos_disponiveis():
-    return {"status":"Vem air!"}
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+            SELECT 
+                AG.id AS agenda_sessao_id,
+                S.sala_id,
+                A.numero AS assento_numero
+            FROM Agenda_Sessao AS AG
+            JOIN Sessoes AS S ON AG.sessao_id = S.id
+            JOIN Assentos AS A ON S.sala_id = A.sala_id
+            WHERE (AG.id, A.id) NOT IN (
+                SELECT agenda_sessao_id, assento_id
+                FROM Reservas
+            )
+            ORDER BY AG.id, A.numero;
+        """)
+        
+    respostas = cursor.fetchall()
+    dados = []
+    for resposta in respostas:
+        dados.append({
+            "Agenda_Sessao":resposta[0],
+            "Sala_ID":resposta[1],
+            "Assento":resposta[2]
+        })
+    cursor.close()
+    conn.close()
+    return {"dados": dados}
 
 """ Reserva um assento para uma sessão específica. (POST) """
 @app.post("/fazer-reserva")
@@ -174,7 +217,7 @@ def alterar_reserva(reserva_id: int, nova_reserva: ReservaRequest):
         conn.close()
 
 """ Deleta uma reserva para uma sessão específica. (POST)  """
-@app.post("/deletar-reserva")
+@app.delete("/deletar-reserva")
 def deletar_reserva():
     return {"status":"Vem air!"}
 
@@ -207,13 +250,13 @@ def adicionar_assento(create: AssentoCreate):
         );
         """, (create.sala_id, create.assento_numero))
         conn.commit()
-        return {"mensagem": f"Assento {create.assento_numero} reservado na sala {create.sala_id}."}
+        return {"mensagem": f"Assento {create.assento_numero} adicionado na sala {create.sala_id}."}
     else:
-        return {"mensagem": f"Assento {create.assento_numero} já foi reservado na sala {create.sala_id}"}
+        return {"mensagem": f"Assento {create.assento_numero} já existe na sala {create.sala_id}"}
         
 
 """ Remover um determinado assento de determinada sala """
-@app.post("/remover-assento")
+@app.delete("/remover-assento")
 def remover_assento(remove: AssentoRemove):
     conn = get_connection()
     cursor = conn.cursor()
@@ -232,8 +275,8 @@ def remover_assento(remove: AssentoRemove):
     if resultado:
         # Removendo o assento
         cursor.execute("""
-        DELETE FROM Assentos AS A 
-        WHERE A.sala_id = %s AND A.numero = %s;
+        DELETE FROM Assentos 
+        WHERE sala_id = %s AND numero = %s;
         """, (remove.sala_id, remove.assento_numero))
         conn.commit()
         return {"mensagem": f"Assento {remove.assento_numero} da sala {remove.sala_id} removido com sucesso."}
