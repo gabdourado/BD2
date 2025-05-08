@@ -5,4 +5,4 @@ projeto-cinema/.env
 venv/
 
 # Ignorar arquivos de cache
-projeto-cinema/__pycache__/
+__pycache__/
