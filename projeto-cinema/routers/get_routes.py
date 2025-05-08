@@ -15,6 +15,7 @@ def listar_filmes_sessao():
 
         cursor.execute(""" 
         SELECT 
+            A.id,
             A.data_sessao, 
             Sa.nome, 
             Se.horario_padrao, 
@@ -26,7 +27,7 @@ def listar_filmes_sessao():
         JOIN Sessoes AS Se ON F.id = Se.filme_id 
         JOIN Salas AS Sa ON Se.sala_id = Sa.id 
         JOIN Agenda_Sessao AS A ON A.sessao_id = Se.id 
-        ORDER BY data_sessao;
+        ORDER BY A.data_sessao, A.id;
         """)
         
         resposta = cursor.fetchall()
@@ -37,13 +38,14 @@ def listar_filmes_sessao():
         sessoes = []
         for linha in resposta:
             sessoes.append({
-                "Data_Sessao":linha[0],
-                "Nome_Sala":linha[1],
-                "Horario": linha[2],
-                "Filme": linha[3],
-                "Duracao": linha[4],
-                "Formato":linha[5],
-                "Preco": float(linha[6])
+                "agenda_sessao_id": linha[0],
+                "data_sessao":linha[1],
+                "nome_sala":linha[2],
+                "horario": linha[3],
+                "Filme": linha[4],
+                "duracao": linha[5],
+                "formato":linha[6],
+                "preco": float(linha[7])
             })
 
         return {"sessoes": sessoes}
