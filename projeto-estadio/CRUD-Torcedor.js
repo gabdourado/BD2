@@ -8,7 +8,11 @@
      */
 async function inserir_torcedor(nome, cpf, email, nivel_socio){
 
-    if (typeof cpf != 'string' || typeof nome !=  'string' || typeof email != 'string' || typeof nivel_socio != 'string'){
+    const args = [nome, cpf, email, nivel_socio]
+
+    const todosValidos = args.every(arg => typeof arg === 'string' && arg.trim() !== '')
+
+    if (!todosValidos){
         console.warn("Aviso: Presenca de argumento invalido");
         return null;
     }
@@ -67,9 +71,13 @@ async function mostrar_torcedores(){
      * @param {string} novo_email - Novo email para ser alterado na base de dados
      * @param {string} novo_nivel - Novo nivel de socio para ser alterado na base de dados
      */
-async function atualizar_torcedor(cpf, novo_nome, novo_cpf, novo_email, novo_nivel){
-    if (typeof cpf != 'string' || typeof novo_nome !=  'string' || typeof novo_cpf != 'string'
-        || typeof novo_email != 'string' || typeof novo_nivel != 'string'){
+async function atualizar_torcedor(cpf, novo_nome, novo_cpf, novo_email, novo_nivel){    
+
+    const args = [cpf, novo_nome, novo_cpf, novo_email, novo_nivel]
+
+    const todosValidos = args.every(arg => typeof arg === 'string' && arg.trim() !== '')
+
+    if (!todosValidos){
         console.warn("Aviso: Presenca de argumento invalido");
         return null;
     }
@@ -88,10 +96,10 @@ async function atualizar_torcedor(cpf, novo_nome, novo_cpf, novo_email, novo_niv
             nivel_socio: novo_nivel
         }})
         
-        console.log("Torcedor ${verifica.nome} atualizado!")
+        console.log(`Torcedor ${verifica.nome} atualizado!`)
     }
     catch(err){
-        console.error("Algo de errado aconteceu: ${err}")
+        console.error(`Algo de errado aconteceu: ${err}`)
     }
 }
 
