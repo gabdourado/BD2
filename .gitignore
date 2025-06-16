@@ -12,3 +12,6 @@ __pycache__/
 
 # Ignorar meu arquivo de orientação
 /projeto-estadio/info.md
+
+# Ignorar arquivo .html
+projeto-estadio/index.html
