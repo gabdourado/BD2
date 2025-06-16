@@ -1,3 +1,10 @@
+/**
+     * Realiza a venda de um ingresso para um determinado jogo, calculando o desconto conforme a categoria do torcedor.
+     * 
+     * @param {string} cpf_usuario - CPF do torcedor para verificação
+     * @param {Date} data_partida - Data da partida para verificação
+     * @todo Do modo como está feito, a lógica é que um cleinte só pode comprar um ingresso
+     */
 async function create_ingresso(cpf_usuario, data_partida){
     if ((!cpf_usuario) || (!data_partida)){
         console.warn("Aviso: Presenca de argumento invalido.");
@@ -50,14 +57,19 @@ async function create_ingresso(cpf_usuario, data_partida){
             data_compra: new Date()
             })
             
-        console.log("Ingresso ${res.insertedId} comprado!")
+        console.log(`Ingresso ${res.insertedId} comprado!`)
     }
     catch(err){
-        console.error("Algo de errado aconteceu: ${err}")
+        console.error(`Algo de errado aconteceu: ${err}`)
         return null;
     }
 }
 
+/**
+     * Lista os ingressos cadastrados na base de dados
+     * 
+     * Não recebe parâmetros
+     */
 async function mostrar_ingressos(){
     try{
         const res = await db.Ingressos.find()
@@ -65,11 +77,17 @@ async function mostrar_ingressos(){
         console.log("Ingressos listados com sucesso.")
     }
     catch(err){
-        console.error("Algo de errado aconteceu: ${err}")
+        console.error(`Algo de errado aconteceu: ${err}`)
         return null;
     }
 }
 
+/**
+     * Deleta um ingresso comprado por um torcedor com base no CPF e data do jogo.
+     * 
+     * @param {string} cpf - CPF do torcedor para verificação
+     * @param {Date} data - Data da partida para verificação
+     */
 async function deletar_ingresso(cpf, data){
     if ((!cpf) || (!data)){
         console.warn("Aviso: Presenca de argumento invalido.");
@@ -101,10 +119,10 @@ async function deletar_ingresso(cpf, data){
     }
     try{
         const res = await db.Ingressos.deleteOne({_id:ingresso._id})
-        console.log("Ingresso ${ingresso._id} deletado.")
+        console.log(`Ingresso ${ingresso._id} deletado.`)
     }
     catch(err){
-        console.error("Algo de errado aconteceu: ${err}")
+        console.error(`Algo de errado aconteceu: ${err}`)
         return null;
     }
 }
