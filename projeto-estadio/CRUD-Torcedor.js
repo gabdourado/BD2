@@ -1,5 +1,4 @@
-async function inserir_torcedor(nome, cpf, email, nivel_socio){
-    /**
+/**
      * Insere um torcedor na base de dados, verificando consistência dos dados
      * 
      * @param {string} nome - Nome do torcedor para cadastro 
@@ -7,12 +6,12 @@ async function inserir_torcedor(nome, cpf, email, nivel_socio){
      * @param {string} email - Email do torcedor para cadastro
      * @param {string} nivel_socio - Nível de Sócio (Vip, Vip+ ou Fanático)
      */
+async function inserir_torcedor(nome, cpf, email, nivel_socio){
 
     if (typeof cpf != 'string' || typeof nome !=  'string' || typeof email != 'string' || typeof nivel_socio != 'string'){
         console.warn("Aviso: Presenca de argumento invalido");
         return null;
     }
-
 
     if ((!cpf) || (!nome) || (!email) || (!nivel_socio)){
         console.warn("Aviso: Presenca de argumento invalido.");
