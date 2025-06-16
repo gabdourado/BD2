@@ -6,6 +6,14 @@ router = APIRouter(prefix="", tags=["POST"])
 
 @router.post("/cadastrar-usuario")
 def cadastrar_usuario(usuario: UsuarioCreate):
+    """Rota para cadastrar usuário
+
+    Args:
+        usuario (UsuarioCreate): Cria um usuário
+    
+    Returns:
+        response (Dict): dicionario com o resultado
+    """
     try:
         conn = get_connection()
         cursor = conn.cursor()
