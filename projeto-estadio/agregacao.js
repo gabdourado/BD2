@@ -1,5 +1,5 @@
 /**
- * Operação que estima o lucro total em um determiando mês
+ * Operacao que estima o lucro por jogo
  * Não rececebe parâmetros
  * @example faturamento_por_jogo()
 
@@ -77,7 +77,6 @@ async function total_ingressos(inicio, fim) {
 /**
  * Operação que retorna quantos ingressos cada torcedor comprou no total (em ordem alfabética)
  * Não recebe parâmetros
- * @todo Ainda não fiz!
  * @example count_ingressos()
  */
 
@@ -85,7 +84,33 @@ async function count_ingressos() {
     
     try{
         const res = await db.Ingressos.aggregate([
-
+            {
+                $group: {
+                _id: "$id_usuario",
+                total_ingressos: { $sum: 1 }
+                }
+            },
+            {
+                $lookup: {
+                from: "Torcedor",
+                localField: "_id",
+                foreignField: "_id",
+                as: "dados_torcedor"
+                }
+            },
+            {
+                $unwind: "$dados_torcedor"
+            },
+            {
+                $project: {
+                _id: 0,
+                nome: "$dados_torcedor.nome",
+                total_ingressos: 1
+                }
+            },
+            {
+                $sort: { nome: 1 }
+            }
         ])
 
         console.log(res)
@@ -95,4 +120,3 @@ async function count_ingressos() {
         return null;
     }
 }
-
